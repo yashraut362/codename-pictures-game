@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSocket } from "../context/SocketContext";
 import { useRouter } from 'next/navigation'
+import { toast } from 'react-toastify';
 
 export default function Home() {
     const { socket, availableRoles } = useSocket();
@@ -33,9 +34,16 @@ export default function Home() {
         if (selectedRole) {
             setSubmittedRole(selectedRole);
             socket.emit('selectRole', selectedRole);
+            toast("Joining Game ...", {
+                theme: "dark",
+                autoClose: 3000,
+            });
             setTimeout(() => { { router.push('/'); } }, 3000);
         } else {
-            alert("Please select a role.");
+            toast.error("Please select a role.", {
+                theme: "dark",
+                autoClose: 3000,
+            });
         }
     };
 
@@ -65,7 +73,6 @@ export default function Home() {
             <button
                 onClick={handleSubmit}
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
-                disabled={!selectedRole}
             >
                 Submit
             </button>

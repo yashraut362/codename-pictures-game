@@ -84,17 +84,17 @@ io.on("connection", (socket: Socket) => {
     socket.emit("gameState", gameState);
 
     socket.on("selectRole", (role: string) => {
-        const playerCount = Object.keys(gameState.players).length;
         let team: Team;
-        if (role === "Red Spymaster" && playerCount === 0) {
+        if (role === "Red Spymaster") {
             team = "Red";
-        } else if (role === "Red Player" && playerCount === 1) {
+        } else if (role === "Red Player") {
             team = "Red";
-        } else if (role === "Blue Spymaster" && playerCount === 2) {
+        } else if (role === "Blue Spymaster") {
             team = "Blue";
-        } else if (role === "Blue Player" && playerCount === 3) {
+        } else if (role === "Blue Player") {
             team = "Blue";
         } else {
+            console.log("Role not available", role);
             socket.emit("roleError", "Role not available");
             return;
         }
