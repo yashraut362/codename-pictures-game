@@ -35,6 +35,15 @@ const codenamePicturesWords = [
     "Treasure Chest"
 ];
 
+let takenRoles: Record<string, boolean> = {
+    "Red Spymaster": false,
+    "Red Player": false,
+    "Blue Spymaster": false,
+    "Blue Player": false,
+};
+
+
+let availableRoles = ["Red Spymaster", "Red Player", "Blue Spymaster", "Blue Player"];
 
 const generateBoard = (): GameState => {
     const cardType: Team[] = [
@@ -58,6 +67,7 @@ const generateBoard = (): GameState => {
         turn: "Red",
         winner: null,
         currentClue: null,
+        players: {}
     };
 };
 
@@ -70,7 +80,39 @@ let gameState: GameState = generateBoard();
 io.on("connection", (socket: Socket) => {
     console.log("User connected:", socket.id);
 
+    socket.emit("availableRoles", availableRoles);
     socket.emit("gameState", gameState);
+
+    socket.on("selectRole", (role: string) => {
+        const playerCount = Object.keys(gameState.players).length;
+        let team: Team;
+        if (role === "Red Spymaster" && playerCount === 0) {
+            team = "Red";
+        } else if (role === "Red Player" && playerCount === 1) {
+            team = "Red";
+        } else if (role === "Blue Spymaster" && playerCount === 2) {
+            team = "Blue";
+        } else if (role === "Blue Player" && playerCount === 3) {
+            team = "Blue";
+        } else {
+            socket.emit("roleError", "Role not available");
+            return;
+        }
+        gameState.players[socket.id] = { role, team };
+
+        takenRoles[role] = true;
+
+        availableRoles = availableRoles.filter(r => !takenRoles[r]);
+        console.log("availableRoles", availableRoles , gameState.players);
+
+
+        io.emit("availableRoles", availableRoles);
+        socket.emit("gameState", gameState);
+        io.emit("playerJoined", { id: socket.id, role, team });
+    });
+
+
+
 
     socket.on("restartGame", () => {
         gameState = generateBoard();
@@ -97,6 +139,22 @@ io.on("connection", (socket: Socket) => {
 
     socket.on("disconnect", () => {
         console.log("User disconnected:", socket.id);
+        if (gameState.players[socket.id]) {
+            const playerRole = gameState.players[socket.id].role;
+            const playerTeam = gameState.players[socket.id].team;
+    
+            delete gameState.players[socket.id];
+    
+            takenRoles[playerRole] = false;
+            availableRoles.push(playerRole);
+
+            // if (gameState.turn === playerTeam) {
+            //     gameState.turn = gameState.turn === "Red" ? "Blue" : "Red"; // Switch turn
+            // }
+    
+            io.emit("gameState", gameState);
+            io.emit("availableRoles", availableRoles);
+        }
     });
 });
 

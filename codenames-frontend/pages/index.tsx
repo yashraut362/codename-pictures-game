@@ -1,24 +1,36 @@
 'use client'
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSocket } from "../context/SocketContext";
 import { useRouter } from 'next/navigation'
 
 const Home: React.FC = () => {
   const { socket, gameState } = useSocket();
   const router = useRouter()
+  const [currentPlayer, setCurrentPlayer] = useState<any | null>(null);
 
   useEffect(() => {
-    console.log(gameState);
+    if (!gameState) return;
     if (gameState?.winner) {
-      console.log("Game ended");
       router.push('/winner?winner=' + gameState.winner);
     }
+    const myId = socket?.id;
+    console.log(gameState.players);
+    if (gameState?.players) {
+      if (gameState?.players[myId]) {
+        setCurrentPlayer(gameState?.players[myId]);
+      } else {
+        setTimeout(() => { { router.push('/join'); } }, 3000);
+      }
+    }
+    console.log(gameState)
   }, [gameState]);
 
 
   const selectCard = (id: number, revealed: boolean) => {
     if (!socket || !gameState) return;
+    if (currentPlayer?.role.includes('Spymaster')) return;
     if (revealed) return;
+    if (currentPlayer.team !== gameState.turn) return;
     console.log("makeGuess", id);
     socket.emit('makeGuess', { id });
   }
@@ -40,7 +52,7 @@ const Home: React.FC = () => {
       </div>
       <div className={`${gameState?.turn === 'Blue' ? 'bg-blue-300' : 'bg-red-300'} h-screen w-3/12`}>
         <div className="flex flex-col items-center justify-center h-full">
-          <p>Your Role :- </p>
+          <p>Your Role :- {currentPlayer?.role}</p>
           <p>Current turn :- {gameState?.turn} </p>
           <p>Blue points :- </p>
           <p>Red points :- </p>

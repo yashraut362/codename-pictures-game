@@ -12,4 +12,5 @@ export interface GameState {
   turn: "Red" | "Blue";
   winner: "Red" | "Blue" | null;
   currentClue: { clue: string; count: number } | null;
+  players:any;
 }
