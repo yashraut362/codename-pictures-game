@@ -17,11 +17,14 @@ const WinnerPage = () => {
         router.push('/');
     }
     return (
-        <Confetti
-            width={1400}
-            height={1000}
-        />
-
+        <>
+            <h1>{name} Team won the game</h1>
+            <button onClick={resetGame}>resetGame</button>
+            <Confetti
+                width={1400}
+                height={1000}
+            />
+        </>
     );
 };
 
