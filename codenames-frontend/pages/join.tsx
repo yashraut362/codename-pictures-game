@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSocket } from "../context/SocketContext";
 import { useRouter } from 'next/navigation'
 import { toast } from 'react-toastify';
+import { BackgroundLines } from "@/components/ui/background-lines";
 
 export default function Home() {
     const { socket, availableRoles } = useSocket();
@@ -38,7 +39,7 @@ export default function Home() {
                 theme: "dark",
                 autoClose: 3000,
             });
-            setTimeout(() => { { router.push('/'); } }, 3000);
+            router.push('/')
         } else {
             toast.error("Please select a role.", {
                 theme: "dark",
@@ -48,40 +49,40 @@ export default function Home() {
     };
 
     return (
-        <div className="container mx-auto p-4 flex flex-col items-center justify-center min-h-screen font-sans">
-            <h1 className="text-3xl font-bold mb-4">Role Selection</h1>
-
-            {availableRoles ? (
-                <div className="role-selection space-y-2">
-                    {filteredRoles.map((role) => (
-                        <label key={role} className="flex items-center">
-                            <input
-                                type="radio"
-                                value={role}
-                                checked={selectedRole === role}
-                                onChange={handleRoleChange}
-                                className="mr-2"
-                            />
-                            {role}
-                        </label>
-                    ))}
+        <>
+            <BackgroundLines className="flex items-center justify-center w-full flex-col px-4">
+                <h2 className="bg-clip-text text-transparent text-center bg-gradient-to-b from-neutral-900 to-neutral-700 dark:from-neutral-600 dark:to-white text-2xl md:text-4xl lg:text-7xl font-sans py-2 md:py-10 relative z-20 font-bold tracking-tight">
+                    Role Selection
+                </h2>
+                <div className='z-50 flex flex-col items-center justify-center'>
+                    {availableRoles ? (
+                        <div className="role-selection space-y-2">
+                            {filteredRoles.map((role) => (
+                                <label key={role} className="flex items-center cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        value={role}
+                                        checked={selectedRole === role}
+                                        onChange={handleRoleChange}
+                                        className="mr-2"
+                                    />
+                                    <p className='text-white text-2xl'> {role}</p>
+                                </label>
+                            ))}
+                        </div>
+                    ) : (
+                        <div>Loading roles...</div>
+                    )}
+                    <button onClick={handleSubmit} className="p-[3px] relative mt-10">
+                        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg" />
+                        <div className="px-8 py-2  bg-black rounded-[6px]  relative group transition duration-200 text-white hover:bg-transparent">
+                            Lets start the game !
+                        </div>
+                    </button>
                 </div>
-            ) : (
-                <div>Loading roles...</div>
-            )}
+            </BackgroundLines>
 
-            <button
-                onClick={handleSubmit}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
-            >
-                Submit
-            </button>
+        </>
 
-            {submittedRole && (
-                <div className="result mt-4 font-bold">
-                    You selected: {submittedRole}
-                </div>
-            )}
-        </div>
     );
 }
