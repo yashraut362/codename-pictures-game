@@ -13,4 +13,6 @@ export interface GameState {
   winner: "Red" | "Blue" | null;
   currentClue: { clue: string; count: number } | null;
   players:any;
+  remainingBlue: number;
+  remainingRed: number;
 }

@@ -67,7 +67,9 @@ const generateBoard = (): GameState => {
         turn: "Red",
         winner: null,
         currentClue: null,
-        players: {}
+        players: {},
+        remainingBlue: 7,
+        remainingRed: 8,
     };
 };
 
@@ -103,7 +105,7 @@ io.on("connection", (socket: Socket) => {
         takenRoles[role] = true;
 
         availableRoles = availableRoles.filter(r => !takenRoles[r]);
-        console.log("availableRoles", availableRoles , gameState.players);
+        console.log("availableRoles", availableRoles, gameState.players);
 
 
         io.emit("availableRoles", availableRoles);
@@ -111,7 +113,10 @@ io.on("connection", (socket: Socket) => {
         io.emit("playerJoined", { id: socket.id, role, team });
     });
 
-
+    socket.on("giveClue", ({ clue, count }) => {
+        gameState.currentClue = { clue, count };
+        io.emit("gameState", gameState);
+    });
 
 
     socket.on("restartGame", () => {
@@ -125,10 +130,20 @@ io.on("connection", (socket: Socket) => {
         if (gameState.winner || gameState.board[id].revealed) return;
         const selectedCard = gameState.board[id];
         console.log(selectedCard.cardType)
-        if (selectedCard.cardType === "Assassin") {
+        const remainingBlue = gameState.board.filter(card => card.cardType === "Blue" && !card.revealed).length;
+        const remainingRed = gameState.board.filter(card => card.cardType === "Red" && !card.revealed).length;
+        gameState.remainingBlue = remainingBlue;
+        gameState.remainingRed = remainingRed;
+        if(remainingBlue === 0) {
+            gameState.winner = "Blue";
+        }else if(remainingRed === 0) {
+            gameState.winner = 'Red';
+        }else if (selectedCard.cardType === "Assassin") {
+            gameState.currentClue = null;
             gameState.winner = gameState.turn === "Red" ? "Blue" : "Red";
         } else if (selectedCard.cardType !== gameState.turn) {
             gameState.board[id].revealed = true;
+            gameState.currentClue = null;
             gameState.turn = gameState.turn === "Red" ? "Blue" : "Red"; // Wrong guess, switch turn
         } else {
             gameState.board[id].revealed = true;
@@ -142,16 +157,17 @@ io.on("connection", (socket: Socket) => {
         if (gameState.players[socket.id]) {
             const playerRole = gameState.players[socket.id].role;
             const playerTeam = gameState.players[socket.id].team;
-    
+
             delete gameState.players[socket.id];
-    
+
             takenRoles[playerRole] = false;
             availableRoles.push(playerRole);
 
+            //if player disconnects, then switch turn
             // if (gameState.turn === playerTeam) {
-            //     gameState.turn = gameState.turn === "Red" ? "Blue" : "Red"; // Switch turn
+            //     gameState.turn = gameState.turn === "Red" ? "Blue" : "Red";
             // }
-    
+
             io.emit("gameState", gameState);
             io.emit("availableRoles", availableRoles);
         }

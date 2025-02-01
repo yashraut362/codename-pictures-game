@@ -1,8 +1,9 @@
+'use client';
 import { useSearchParams } from 'next/navigation';
 import React from "react";
 import { useSocket } from "../context/SocketContext";
 import { useRouter } from 'next/navigation'
-
+import Confetti from 'react-confetti'
 
 const WinnerPage = () => {
     const { socket } = useSocket();
@@ -16,10 +17,11 @@ const WinnerPage = () => {
         router.push('/');
     }
     return (
-        <div>
-            <h1>Winner: {name}</h1>
-            <button onClick={() => resetGame()}>Restart game</button>
-        </div>
+        <Confetti
+            width={1400}
+            height={1000}
+        />
+
     );
 };
 
