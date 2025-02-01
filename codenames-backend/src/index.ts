@@ -33,8 +33,8 @@ const codenamePicturesWords = [
     "Scissors",
     "Hot Air Balloon",
     "Treasure Chest"
-  ];
-  
+];
+
 
 const generateBoard = (): GameState => {
     const cardType: Team[] = [
@@ -61,15 +61,37 @@ const generateBoard = (): GameState => {
     };
 };
 
+const endGame = () => {
+    console.log("Game ended");
+}
+
 let gameState: GameState = generateBoard();
 
 io.on("connection", (socket: Socket) => {
     console.log("User connected:", socket.id);
-    
+
     socket.emit("gameState", gameState);
 
     socket.on("restartGame", () => {
         gameState = generateBoard();
+        console.log("Game restarted");
+        io.emit("gameState", gameState);
+    });
+
+    socket.on("makeGuess", ({ id }) => {
+        console.log("makeGuess", id);
+        if (gameState.winner || gameState.board[id].revealed) return;
+        const selectedCard = gameState.board[id];
+        console.log(selectedCard.cardType)
+        if (selectedCard.cardType === "Assassin") {
+            gameState.winner = gameState.turn === "Red" ? "Blue" : "Red";
+        } else if (selectedCard.cardType !== gameState.turn) {
+            gameState.board[id].revealed = true;
+            gameState.turn = gameState.turn === "Red" ? "Blue" : "Red"; // Wrong guess, switch turn
+        } else {
+            gameState.board[id].revealed = true;
+        }
+
         io.emit("gameState", gameState);
     });
 
