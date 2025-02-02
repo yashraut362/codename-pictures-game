@@ -114,6 +114,12 @@ io.on("connection", (socket: Socket) => {
         io.emit("gameState", gameState);
     });
 
+    socket.on('switchTurn', () => {
+        gameState.turn = gameState.turn === "Red" ? "Blue" : "Red";
+        gameState.currentClue = null;
+        io.emit("gameState", gameState);
+    });
+
 
     socket.on("restartGame", () => {
         gameState = generateBoard();
