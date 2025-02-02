@@ -40,7 +40,11 @@ bun run dev
 https://github.com/user-attachments/assets/4bdc1fb1-8c32-4fb0-9b93-f992fd974b8a
 
   
-🔍 **Project Architecture Explanation** – [Link Coming Soon]  
+🔍 **Project Architecture Explanation** – 
+
+
+https://github.com/user-attachments/assets/1080620f-6e9d-4343-9c8d-d96447ef9044
+
 
 
 ---
