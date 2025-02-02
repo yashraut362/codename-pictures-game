@@ -3,7 +3,23 @@ import http from "http";
 import { Server, Socket } from "socket.io";
 import cors from "cors";
 import { Card, GameState, Team } from "./types";
+import {createClient} from 'redis';
 
+// Create a Redis client
+const client = createClient({
+    url: 'redis://localhost:6379' 
+});
+
+// Handle Redis connection events
+client.on('connect', () => {
+    console.log('Connected to Redis');
+});
+
+client.on('error', (err) => {
+    console.log('Redis error:', err);
+});
+
+client.connect();
 const app = express();
 app.use(cors());
 
@@ -75,6 +91,17 @@ const generateBoard = (): GameState => {
 
 let gameState: GameState = generateBoard();
 
+
+const saveGameStateToRedis = async (gameState: GameState): Promise<void> => {
+    const gameStateKey = `codenames:gameState:${Date.now()}`;  // Key for storing game state
+    try {
+        const reply = await client.set(gameStateKey, JSON.stringify(gameState));  // Use await for promise
+        console.log('Game state saved to Redis:', reply);
+    } catch (err) {
+        console.error('Error saving game state to Redis', err);
+    }
+};
+
 io.on("connection", (socket: Socket) => {
     console.log("User connected:", socket.id);
 
@@ -138,11 +165,14 @@ io.on("connection", (socket: Socket) => {
         gameState.remainingRed = remainingRed;
         if(remainingBlue === 0) {
             gameState.winner = "Blue";
+            saveGameStateToRedis(gameState);
         }else if(remainingRed === 0) {
             gameState.winner = 'Red';
+            saveGameStateToRedis(gameState);
         }else if (selectedCard.cardType === "Assassin") {
             gameState.currentClue = null;
             gameState.winner = gameState.turn === "Red" ? "Blue" : "Red";
+            saveGameStateToRedis(gameState);
         } else if (selectedCard.cardType !== gameState.turn) {
             gameState.board[id].revealed = true;
             gameState.currentClue = null;
@@ -175,5 +205,27 @@ io.on("connection", (socket: Socket) => {
         }
     });
 });
+
+
+app.get('/api/gameHistory', async (req, res) => {
+    try {
+      // Fetch all keys with pattern for game states
+      const keys = await client.keys('codenames:gameState:*');
+      console.log('Found keys:', keys);
+  
+      // Fetch all game states from Redis
+      const gameStates = await Promise.all(
+        keys.map(async (key) => {
+          const gameState = await client.get(key);
+          return JSON.parse(gameState!);  // Parse game state string into object
+        })
+      );
+  
+      res.json({ gameStates });  // Send game states as JSON response
+    } catch (err) {
+      console.error('Error fetching game states:', err);
+      res.status(500).json({ error: 'Error fetching game states' });
+    }
+  });
 
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

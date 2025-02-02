@@ -4,20 +4,22 @@ import { useSocket } from "../context/SocketContext";
 import { useRouter } from 'next/navigation'
 import { toast } from 'react-toastify';
 import AddClueModal from "@/components/addClueModal";
+import ShowHistoryModal from "@/components/showHistory";
 import Image from "next/image";
 const Home: React.FC = () => {
   const { socket, gameState } = useSocket();
   const router = useRouter()
   const [currentPlayer, setCurrentPlayer] = useState<any | null>(null);
   const [clueModalOpen, setClueModalOpen] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
 
   useEffect(() => {
     if (!gameState) return;
     if (gameState?.winner) {
       toast(`Game Over! ${gameState.winner} team won the game`);
-      // setTimeout(() => {
-      //   router.push('/winner?winner=' + gameState.winner);
-      // }, 3000);
+      setTimeout(() => {
+        router.push('/winner?winner=' + gameState.winner);
+      }, 3000);
     }
     const myId = socket?.id;
     console.log(gameState.players);
@@ -59,6 +61,13 @@ const Home: React.FC = () => {
 
   const handleCloseModal = () => {
     setClueModalOpen(false);
+  }
+
+  const handleHistoryModal = () => {
+    setShowHistoryModal(true);
+  }
+  const closeHistoryModal = () => {
+    setShowHistoryModal(false);
   }
 
   const addClue = (clue: string, count: number) => {
@@ -175,6 +184,13 @@ const Home: React.FC = () => {
                   </span>
                 </button>
               }
+              <br />
+              <button onClick={() => handleHistoryModal()} className="relative inline-flex h-12 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 mt-10 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50">
+                <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
+                <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-950 px-6 py-1 text-lg font-medium text-white backdrop-blur-3xl">
+                  See history
+                </span>
+              </button>
             </div>
           </div>
         </div>
@@ -184,6 +200,11 @@ const Home: React.FC = () => {
           onClose={handleCloseModal}
           onSubmit={addClue}
         />}
+      {showHistoryModal &&
+        <ShowHistoryModal
+          onClose={closeHistoryModal}
+        />
+      }
     </>
   );
 };
