@@ -40,7 +40,8 @@ bun run dev
 # 📹 Videos  
 🎥 **Demo Video** – 
 
-https://github.com/user-attachments/assets/4bdc1fb1-8c32-4fb0-9b93-f992fd974b8a
+https://github.com/user-attachments/assets/77bcde5e-2446-4e7a-a9a3-59cb47ec26b1
+
 
   
 🔍 **Project Architecture Explanation** – 
