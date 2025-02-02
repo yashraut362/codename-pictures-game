@@ -30,7 +30,18 @@ bun run dev
 # ⚙️ Backend Tech Stack  
 - 🚀 **Express.js** – Fast and minimal backend framework  
 - 🔄 **socket.io** – WebSockets for real-time features  
-- 🛢️ **Redis** – (Optional) Used for storing game history  
+- 🛢️ **Redis** – (Optional) Used for storing game history
+
+---
+
+# 📹 Videos  
+🎥 **Demo Video** – 
+
+https://github.com/user-attachments/assets/4bdc1fb1-8c32-4fb0-9b93-f992fd974b8a
+
+  
+🔍 **Project Architecture Explanation** – [Link Coming Soon]  
+
 
 ---
 
