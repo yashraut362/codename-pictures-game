@@ -35,6 +35,9 @@ bun run dev
 - 🔄 **socket.io** – WebSockets for real-time features  
 - 🛢️ **Redis** – (Optional) Used for storing game history
 
+
+The current code quality can be improved as it contains console logs and lacks optimization. However, due to time constraints, this is the best I can achieve for now, though there is significant potential for optimization.
+
 ---
 
 # 📹 Videos  
