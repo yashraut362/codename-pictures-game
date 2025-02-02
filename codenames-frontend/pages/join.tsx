@@ -39,7 +39,9 @@ export default function Home() {
                 theme: "dark",
                 autoClose: 3000,
             });
-            router.push('/')
+            setTimeout(() => {
+                router.push('/')
+            }, 3000);
         } else {
             toast.error("Please select a role.", {
                 theme: "dark",
