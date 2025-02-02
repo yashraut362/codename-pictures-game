@@ -1,3 +1,6 @@
+![cropped](https://github.com/user-attachments/assets/2473e2b2-6b17-4392-b3eb-6d9b3e5d7d08)
+
+
 # 🚀 Project Setup  
 
 ### 🛠 Prerequisites  
