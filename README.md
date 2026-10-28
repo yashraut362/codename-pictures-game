@@ -73,4 +73,4 @@ Due to time constraints, the following features are planned for future updates:
 ✅ **Enhanced error handling** – More robust backend and frontend error management  
 ✅ **Better UI/UX** – Improve design, animations, and user experience  
 
-Stay tuned for updates! 🎉  
+Not working on this game anymore ! 
